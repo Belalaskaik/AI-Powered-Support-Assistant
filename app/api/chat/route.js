@@ -1,24 +1,20 @@
-import { NextResponse } from 'next/server' // Import NextResponse from Next.js for handling responses
+import {NextResponse} from 'next/server' // Import NextResponse from Next.js for handling responses
 import OpenAI from 'openai' // Import OpenAI library for interacting with the OpenAI API
 
 // System prompt for the AI, providing guidelines on how to respond to users
-const systemPrompt = "You are a helpful assistant designed to provide support and answer questions." // Define the system prompt
+const systemPrompt = "How may I help you?"
 
 // POST function to handle incoming requests
 export async function POST(req) {
-  const openai = new OpenAI({
-    apiKey: process.env.OPENAI_API_KEY, // Correctly access the API key from environment variables
-  }) // Create a new instance of the OpenAI client
+  const openai = new OpenAI() // Create a new instance of the OpenAI client
   const data = await req.json() // Parse the JSON body of the incoming request
 
   // Create a chat completion request to the OpenAI API
   const completion = await openai.chat.completions.create({
-    messages: [
-        { role: 'system', content: "You are a helpful assistant." },
-        { role: 'user', content: "What is the capital of France?" }
-      ],
-      model: 'gpt-3.5-turbo', // Choose the model you want to use    stream: true, // Enable streaming responses
-  });
+    messages: [{role: 'system', content: systemPrompt}, ...data], // Include the system prompt and user messages
+    model: 'gpt-4o', // Specify the model to use
+    stream: true, // Enable streaming responses
+  })
 
   // Create a ReadableStream to handle the streaming response
   const stream = new ReadableStream({
@@ -34,7 +30,6 @@ export async function POST(req) {
           }
         }
       } catch (err) {
-        console.error('Streaming error:', err) // Log the error
         controller.error(err) // Handle any errors that occur during streaming
       } finally {
         controller.close() // Close the stream when done

@@ -93,7 +93,6 @@ export default function Home() {
       flexDirection="column"
       justifyContent="center"
       alignItems="center"
-      bgcolor="grey.100"
     >
       <Stack
         direction={'column'}
